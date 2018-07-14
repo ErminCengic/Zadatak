@@ -1,0 +1,93 @@
+.headerDiv {
+	border-bottom: 1px solid gray;
+	font-weight: bold;
+	margin-bottom: 25px;
+}
+
+.headerReports {
+	border-right: 1px solid gray;
+	padding-right: 3px;
+	margin-right: 3px;
+}
+
+.filterDiv{
+	border: 1px solid rgb(208,208,208);
+}
+
+#filterBtn {
+	position: relative;
+	top: -12px;
+	margin-left: 15px;
+}
+
+#filterBtn:before {
+	position: relative;
+	top: -5px;
+	content: "\2212";
+	font-weight: bold;
+}
+
+#filterBtn.special:before {
+	content: "\002b";
+	font-weight: bold;
+}
+
+.multiselect {
+  width: 200px;
+	display: inline-block;
+	margin-left: 15px;
+}
+
+.selectBox {
+  position: relative;
+}
+
+.selectBox select {
+  width: 180px;
+}
+
+.overSelect {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+#checkboxes {
+	width: 210px;
+	max-height: 150px;
+	overflow-y:scroll;
+	background-color: white;
+  display: none;
+	position:absolute;
+  border: 1px #dadada solid;
+}
+
+#checkboxes label {
+  display: block;
+}
+
+#selectYear {
+	margin-left: 15px;
+	margin-bottom: 10px;
+	width: 180px;
+	margin-right: 30px;
+}
+
+#filterContent {
+	display: block;
+}
+
+#filterContent.show {
+	display: none;
+}
+
+#annualReport {
+	display: none;
+}
+
+#annualReport.show {
+	display: block;
+}
+

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+	<body>
+			<div class="headerDiv"><span class="headerReports">Reports</span><span>Team(s)</span></div>
+		
+			<div class="filterDiv">
+				<button onclick="filterBtn()" type="button" id="filterBtn">&nbsp Filter</button>
+				<div id="filterContent">		
+				
+					<div class="multiselect">
+						<div class="selectBox" onclick="showCheckboxes()">
+							<select>
+								<option>Select team</option>
+							</select>
+							<div class="overSelect"></div>
+						</div>
+						<div id="checkboxes"></div>
+					</div>
+
+					<select id="selectYear"></select>
+						
+					<button onclick="showBtn()" type="button">Show</button>
+
+				</div>
+			</div>
+
+			<br>
+			<div id="annualReport"></div>
+
+		<div id="popupDiv" style="display: none">
+
+		<script src="indexedDb.js"></script>
+	</body>
+</html>
