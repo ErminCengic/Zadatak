@@ -4,7 +4,7 @@
     window.alert("Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available.");
 	}
 
-	const DB_NAME = "MyData3";
+	const DB_NAME = "IndexedDb";
 	const DB_VERSION = 3;
 	//window.indexedDB.deleteDatabase(DB_NAME);
 
@@ -37,9 +37,8 @@
 
 	var db;
 
-	function openDb() {	
+	function openDb() {
 		var request = window.indexedDB.open(DB_NAME, DB_VERSION);
-		
 
 		var selectYear = document.getElementById("selectYear");
 		// add every year as option in selectBox
@@ -52,18 +51,18 @@
 			onupgradeneeded event will be triggered */
 		request.onupgradeneeded = function(event){
 			var db = event.target.result;
-			
+
 			/* Create objectStores to hold information about employees, teams, annualReports and monthlyReports */
-			var employeeStore = db.createObjectStore("employees", { keyPath: ["name"] });			
-			var teamStore = db.createObjectStore("teams", { keyPath: ["team"] });	
+			var employeeStore = db.createObjectStore("employees", { keyPath: ["name"] });
+			var teamStore = db.createObjectStore("teams", { keyPath: ["team"] });
 			var annualReportStore = db.createObjectStore("annualReports", { keyPath: ["name", "year"] });
 			var monthlyReportStore = db.createObjectStore("monthlyReports", { keyPath: ["name", "year", "month"] });
-		
+
 			employeeStore.createIndex("projects", "projects", { unique: false });
 			teamStore.createIndex("employees", "employees", { unique: false });
 			annualReportStore.createIndex("months", "months", { unique: false });
 			monthlyReportStore.createIndex("works", "works", { unique: false });
-		
+
 			employeeStore.transaction.oncomplete = function(event) {
   	 		var employeeObjectStore = db.transaction("employees", "readwrite").objectStore("employees");
 
@@ -72,7 +71,7 @@
    				// add employee to the database
       		employeeObjectStore.add(employee);
 					for(var i = 0; i < years.length; ++i){
-						addAnnualReports(db, employee, i);	
+						addAnnualReports(db, employee, i);
 						addMonthlyReports(db, employee, i);
 					}
     		});
@@ -82,29 +81,29 @@
 					//add team object to the databse
 					teamObjectStore.add(team);
 				});
-  		};		
-			
+  		};
+
 		};//request.onupgradeneeded
 
 		request.onerror = function(event) {
 			alert("Request error!");
 		};
-		
-		//onsuccess 
+
+		//onsuccess
 		request.onsuccess = function(event) {
 			db = event.target.result;
 			var selectTeam = document.getElementById("checkboxes");
 			var first = 0;
 			var teamStore = db.transaction("teams").objectStore("teams");
-			// for every team in database create checkBox in selectBox 
+			// for every team in database create checkBox in selectBox
 			teamStore.openCursor().onsuccess = function(event) {
 				var cursor = event.target.result;
 				if (cursor) {
 					if(first == 0){
-						//first checkBox 
+						//first checkBox
 						var label = document.createElement("label");
 						label.setAttribute("for", "All");
-						
+
 						var span = document.createElement("span");
 						span.setAttribute("style", "float:right; margin-right: 5px; cursor:pointer");
 						span.addEventListener('click', showCheckboxes, false);
@@ -123,31 +122,31 @@
 					cursor.continue();
 				}
 			};
-			
+
 		};//request.onsuccess
 
 	}//openDb
 
 	openDb();
-	
+
 	function addAnnualReports(db, employee, i) {
 			// create annualReport object
-			var annualReport = { 
-					name: employee.name, 
+			var annualReport = {
+					name: employee.name,
 					year: years[i],
-					months: ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"] 
+					months: ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
 			};
 			// add annualReport object to the database (store: annualReports)
 		  db.transaction("annualReports", "readwrite").objectStore("annualReports").add(annualReport);
 	}
-	
+
 	function addMonthlyReports(db, employee, i) {
 		for(var j = 1; j <= 12; ++j){
 			var firstDay = new Date(years[i], j-1, 1);
 			var day = firstDay.getDay();
 			day = day === 0 ? 7 : day;
 
-			var monday = 9 - day; 
+			var monday = 9 - day;
 			var mondays = []; //array of every monday in month
 			var count = new Date(years[i], j, 0).getDate(); //number of days in month
 
@@ -157,7 +156,7 @@
 			while(monday <= count){
 				mondays.push(monday);
 				monday += 7;
-			}			
+			}
 
 			var work = [];
 			/* for every monday in month create workObject with monday, available, and projects,
@@ -168,10 +167,10 @@
 					var projectObject = { projectName: p, time: 0 }
 					project.push(projectObject);
 				});
-			
+
 				var workObject = { monday: mondays[k], available: -1, projects: project };
 				work.push(workObject);
-			}	
+			}
 			/* Create monthlyReportObject with name, year, month, and array works
 				works contain workObjects */
 			var monthlyReport = {name: employee.name, year: years[i], month: j, works: work };
@@ -179,12 +178,12 @@
 			db.transaction("monthlyReports", "readwrite").objectStore("monthlyReports").add(monthlyReport);
 		}
 	}
-	
+
 	function filterBtn() {
 		document.getElementById("filterBtn").classList.toggle("special");
 		document.getElementById("filterContent").classList.toggle("show");
 		document.getElementById("annualReport").classList.toggle("show");
-	
+
 		var div = document.getElementById("annualReport");
 		while(div.firstChild){
 		  div.removeChild(div.firstChild);
@@ -205,7 +204,7 @@
 			expanded = true;
 		}
 	}
-	
+
   function showBtn() {
 		var checkedBoxes = []; // all checked boxes
 		var checkboxes = document.querySelectorAll('#checkboxes input[type=checkbox]:checked');
@@ -222,7 +221,7 @@
 		// close filter content div
   	filterBtn();
 		showCheckboxes();
-  	
+
   	var selectYear = document.getElementById("selectYear");
   	var year = selectYear.options[selectYear.selectedIndex].text;
 
@@ -245,9 +244,9 @@
 		var annualReport = document.getElementById("annualReport");
 			var table = document.createElement("table");
 			table.setAttribute("style", "width:100%; border-collapse: collapse; border: 1px solid gray;");
-			
+
 			var tr,th,td;
-			
+
 			tr = document.createElement("tr");
 			td = document.createElement("td");
 			td.setAttribute("style", "background-color:#f5f6f7; font-weight:bold; text-align:center; border: 1px solid gray;");
@@ -255,14 +254,14 @@
 			td.innerHTML = team;
 			tr.appendChild(td);
 			table.appendChild(tr)
-			
+
 			// table header Name
 			tr = document.createElement("tr");
 			th = document.createElement("th");
 			th.setAttribute("style", "background-color:#e5e8e8; font-weight:bold; align:center; width: 20%; border: 1px solid gray;");
 			th.innerHTML = "Name";
 			tr.appendChild(th);
-		
+
 			var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 			// table header months
 			for(var i = 0; i < months.length; ++i) {
@@ -272,21 +271,21 @@
 				tr.appendChild(th);
 			}
 			table.appendChild(tr);
-			
+
 			var employees = [];
 			for(var i = 0; i < cursor.value.employees.length; ++i){
 				employees.push(cursor.value.employees[i]);
 			}
 			employees.sort();
-			
-			var reportStore = db.transaction("annualReports").objectStore("annualReports");	
+
+			var reportStore = db.transaction("annualReports").objectStore("annualReports");
 			var temp = 0;
 
 			var totalMonths = []; // array total percentage for every month
 			// for every employee create row with percentage in months
 			employees.forEach(function(employee) {
 			  var req = reportStore.get([employee, parseInt(year)]);
-			  
+
 				req.onsuccess = function(event) {
 					++temp;
 					tr = document.createElement("tr");
@@ -297,34 +296,34 @@
 					td.setAttribute("id", team + "_" + temp);
 					td.innerHTML = "&nbsp" + employee;
 					tr.appendChild(td);
-				
+
 					for(var i = 0; i < months.length; ++i) {
 						td = document.createElement("td");
 						td.setAttribute("style", "text-align:right; border: 1px solid gray; cursor:pointer;");
-						td.setAttribute("id", team + "_" + employee + "_" + (i+1)); 	
+						td.setAttribute("id", team + "_" + employee + "_" + (i+1));
 						// onclick call openPopup function
 						td.addEventListener('click',function(e) {
      					openPopup(e.target.id, year);
      				} ,false);
 						if(totalMonths.length < 12)
 								totalMonths.push({ sum: 0, count: 0 });
-						
+
 						if( req.result.months[i] != "-") {
 							td.innerHTML = parseFloat(req.result.months[i]).toFixed(1) + "% &nbsp";
 
 							totalMonths[i].sum += parseFloat(parseFloat(req.result.months[i]).toFixed(1));
-							totalMonths[i].count += 1;							
+							totalMonths[i].count += 1;
 						} else {
 							td.innerHTML = "-" + "&nbsp";
-						} 
+						}
 
 						tr.appendChild(td);
 					}
-					table.appendChild(tr);	
-					
+					table.appendChild(tr);
+
 					if(temp >= employees.length){
 						tr = document.createElement("tr");
-						td = document.createElement("td");			
+						td = document.createElement("td");
 						td.setAttribute("style", "background-color:#e5e8e8; font-weight:bold; text-align:right; width:20%; border: 1px gray solid;");
 						td.innerHTML = "Total: &nbsp";
 						tr.appendChild(td);
@@ -334,17 +333,17 @@
 							td = document.createElement("td");
 							td.setAttribute("style","background-color:#e5e8e8; font-weight:bold; text-align:right; border:1px gray solid;");
 							td.setAttribute("id", "total_" + team + (i+1));
-						
+
 							var total = 0;
 							if(totalMonths[i].count != 0)
-								total = (totalMonths[i].sum / totalMonths[i].count).toFixed(1);	
-											
+								total = (totalMonths[i].sum / totalMonths[i].count).toFixed(1);
+
 							td.innerHTML = total + "%&nbsp";
 							tr.appendChild(td);
 						}
 						table.appendChild(tr);
 					}
-					
+
 				};
 			});
 
@@ -372,15 +371,15 @@
 		// add month year and name to popupDiv header
 		var header = document.createElement("h2");
 		header.setAttribute("style", "align:left; margin-left: 10px;");
-		header.innerHTML = months[month-1] + " " + year + " (" + name + ")";		
-		
+		header.innerHTML = months[month-1] + " " + year + " (" + name + ")";
+
 		// span for close popup
 		var span = document.createElement("span");
 		span.setAttribute("style", "float:right; cursor:pointer; margin-right:5px;");
 		span.innerHTML = "&#10006";
 		span.addEventListener('click', closePopup, false);
-	
-		header.appendChild(span);	
+
+		header.appendChild(span);
 		popupDiv.appendChild(header);
 
 		var hr = document.createElement("hr");
@@ -397,65 +396,65 @@
 
 		var reportStore = db.transaction("monthlyReports").objectStore("monthlyReports");
 		// get monthlyReport object
-		var request = reportStore.get([name, parseInt(year), parseInt(month)]); 
+		var request = reportStore.get([name, parseInt(year), parseInt(month)]);
 		request.onsuccess = function(event) {
 			var works = request.result.works;
 			th = document.createElement("th");
 			th.setAttribute("style", "background-color:#e5e8e8; font-weight:bold; align:center; width:'20%'; border: 1px solid gray;");
 			th.innerHTML = "Project(s)";
 			tr.appendChild(th);
-			
+
 			var secondTr = document.createElement("tr");
 			secondTr.setAttribute("id", "available_" + name);
 			var secondTd = document.createElement("td");
 			secondTd.setAttribute("style", "align:center; width:'20%'; border: 1px solid gray;");
 			secondTd.innerHTML = "&nbspAvailable";
 			secondTr.appendChild(secondTd);
-			
+
 			var sumColumn = [];
-			
+
 			for(var i = 0; i < works.length; ++i){
 				th = document.createElement("th");
-				th.setAttribute("style", "background-color:#e5e8e8; font-weight:bold; align:center; width:'6.6%'; border: 1px solid gray;");	
-				
+				th.setAttribute("style", "background-color:#e5e8e8; font-weight:bold; align:center; width:'6.6%'; border: 1px solid gray;");
+
 				var mondayMonth;
 				if(works[i].monday < 10)
 					mondayMonth = "0" + works[i].monday;
 				else
 					mondayMonth = works[i].monday;
-					
+
 				if(parseInt(month) < 10)
 					mondayMonth += ".0" + month;
 				else
-					mondayMonth += "." + month;			
-				
+					mondayMonth += "." + month;
+
 				// table header with mondays in month
 				th.innerHTML = mondayMonth;
 				tr.appendChild(th);
-				
+
 				// available row
 				secondTd = document.createElement("td");
 				secondTd.setAttribute("style", "text-align:left; width:'6.6%'; border: 1px solid gray;");
 				secondTd.setAttribute("contenteditable", "true");
 				secondTd.addEventListener('focus', function(e) {
-						document.execCommand('selectAll', false, null) 
+						document.execCommand('selectAll', false, null)
 					}, false);
-					
+
 				if(works[i].available == -1)
 					secondTd.innerHTML = "&nbsp-";
 				else
 					secondTd.innerHTML = "&nbsp" + works[i].available;
 				secondTr.appendChild(secondTd);
-				
+
 				// for every monday create objectColumn and add to array sumColumn
 				// work is sum of work days for every project for current monday
-				var objectColumn = { available: 0, work: 0 }; 
+				var objectColumn = { available: 0, work: 0 };
 				objectColumn.available = works[i].available;
 				sumColumn.push(objectColumn);
 			}
 			table.appendChild(tr);
 			table.appendChild(secondTr);
-			
+
 			var numProjects = works[0].projects.length;
 			// for every project create row
 			for(var i = 0; i < numProjects; ++i){
@@ -466,48 +465,48 @@
 				td.setAttribute("style", "align:left; width:'20%'; border: 1px solid gray;");
 				td.innerHTML = "&nbsp" + works[0].projects[i].projectName;
 				tr.appendChild(td);
-				
+
 				// for every monday increase sum work
 				for(var j = 0; j < works.length; ++j){
 					td = document.createElement("td");
 					td.setAttribute("style", "text-align:left; width:'6.6%'; border: 1px solid gray; cursor:pointer;");
 					td.setAttribute("contenteditable", "true");
 					td.addEventListener('focus', function(e) {
-						document.execCommand('selectAll',false,null) 
+						document.execCommand('selectAll',false,null)
 					}, false);
 					td.innerHTML = "&nbsp" + parseFloat(works[j].projects[i].time).toFixed(1);
 					tr.appendChild(td);
-					
+
 					sumColumn[j].work = parseFloat(sumColumn[j].work) + parseFloat(works[j].projects[i].time);
 				}
-				table.appendChild(tr);			
+				table.appendChild(tr);
 			}
-			
+
 			// last row
 			tr = document.createElement("tr");
 			td = document.createElement("td");
 			td.setAttribute("style", "background-color:#e5e8e8; text-align:right; width:'20%'; border: 1px gray solid;");
 			td.innerHTML = "Utilization: &nbsp";
 			tr.appendChild(td);
-			
+
 			for(var i = 0; i < works.length; ++i){
 				td = document.createElement("td");
 				td.setAttribute("style","background-color:#e5e8e8; text-align:right; width:'6.6%'; border:1px gray solid;");
-				
+
 				var utilization = -1;
 				if(sumColumn[i].available != -1 && sumColumn[i].available != 0 && sumColumn[i].available != "-"){
-					utilization = ( sumColumn[i].work / sumColumn[i].available ) * 100;				
+					utilization = ( sumColumn[i].work / sumColumn[i].available ) * 100;
 				}
 				if(utilization == -1)
 					td.innerHTML = "- &nbsp";
 				else
 					td.innerHTML = utilization.toFixed(1) + "% &nbsp";
-					
+
 				tr.appendChild(td);
 			}
-			table.appendChild(tr);		
+			table.appendChild(tr);
 			popupDiv.appendChild(table);
-			
+
 			// button - Save all changes
 			var button = document.createElement("button");
 			button.setAttribute("type", "button");
@@ -516,7 +515,7 @@
 			button.addEventListener('click',function(e) {
      		save(team, name, parseInt(year), parseInt(month))
      	} ,false);
-			
+
 			popupDiv.appendChild(button);
 			popupDiv.appendChild(document.createElement("br"));
 			popupDiv.appendChild(document.createElement("br"));
@@ -532,13 +531,13 @@
 		}
 		return true;
 	}
-	
-	
-	
+
+
+
 	function save(team, name, year, month) {
 		if(!confirm("Do you want to save changes?"))
 			return false;
-	
+
 		// get all element in available row
 		var td = document.getElementById("available_" + name).children;
 		available = [];
@@ -562,7 +561,7 @@
 				}
 			}
 		}
-		
+
 		var tableChildren = document.getElementById("monthTable").children;
 		var works = [];
 		for(var i = 2; i < tableChildren.length - 1; ++i){
@@ -585,17 +584,17 @@
 			}
 			works.push(worksObject);
 		}
-		
+
 		var sumWeek = [];
 		for(var i = 0; i < works.length; ++i){
 			for(var j = 0; j < works[i].work.length; ++j){
 				if(sumWeek.length <= j)
 					sumWeek.push(0);
-				
+
 				sumWeek[j] = parseFloat(sumWeek[j]) + parseFloat(works[i].work[j]);
 			}
 		}
-		
+
 		percentageWeek = [];
 		var percentage;
 		for(var i = 0; i < available.length; ++i){
@@ -608,36 +607,36 @@
 				alert("The sum of working days should not be greater than available");
 				return false;
 			}
-			
+
 			if(available[i] == 0)
 				percentage = parseFloat(0);
 			else
 				percentage = parseFloat((sumWeek[i] / available[i]) * 100);
-				
+
 			percentage = percentage.toFixed(1);
 			tableChildren[tableChildren.length-1].children[i+1].innerHTML = percentage + "% &nbsp";
 
-			percentageWeek.push(percentage); 			
+			percentageWeek.push(percentage);
 		}
-		
+
 		if(percentageWeek.indexOf(-1) == -1 ){
 			var percentageTotal = 0;
 			for(var i = 0; i < percentageWeek.length; ++i)
 				percentageTotal = parseFloat(percentageTotal) + parseFloat(percentageWeek[i]);
-				
+
 			percentageTotal /= percentageWeek.length;
 			updateAnnualReport(team, name, year, month, percentageTotal.toFixed(1));
 		}
 		else{
 			updateAnnualReport(team, name, year, month, "-")
 		}
-		
-		updateMonthlyReport(name, year, month, available, works);				
+
+		updateMonthlyReport(name, year, month, available, works);
 	}
-	
-	// update annualReport 
+
+	// update annualReport
 	function updateAnnualReport(team, name, year, month, total){
-		var reportStore = db.transaction("annualReports","readwrite").objectStore("annualReports");	
+		var reportStore = db.transaction("annualReports","readwrite").objectStore("annualReports");
 		var request = reportStore.get([name, year]);
 		request.onsuccess = function(event) {
 			var data = event.target.result;
@@ -649,12 +648,12 @@
 					element.innerHTML = "- &nbsp";
 				else
 					element.innerHTML = total + "% &nbsp";
-					
+
 				updateTotalMonth(team, month);
 			};
 		};
 	}
-	
+
 	function updateTotalMonth(team, month) {
 		var total = document.getElementById("total_" + team + month);
 		var teamStore = db.transaction("teams").objectStore("teams");
@@ -683,7 +682,7 @@
 
 	// updateMonthlyReport
 	function updateMonthlyReport(name, year, month, available, works) {
-		var reportStore = db.transaction("monthlyReports","readwrite").objectStore("monthlyReports");	
+		var reportStore = db.transaction("monthlyReports","readwrite").objectStore("monthlyReports");
 		var request = reportStore.get([name, year, month]);
 		request.onsuccess = function(event) {
 			var data = event.target.result;
@@ -692,7 +691,7 @@
 					data.works[i].available = "-";
 				else
 					data.works[i].available = available[i];
-					
+
 				for(var j = 0; j < works.length; ++j){
 					var project = data.works[i].projects[j].projectName;
 					var index = -1;
@@ -701,10 +700,10 @@
 							index = k;
 					}
 					if(index != -1)
-						data.works[i].projects[j].time = works[index].work[i];				
+						data.works[i].projects[j].time = works[index].work[i];
 				}
 			}
-			
+
 			var requestUpdate = reportStore.put(data);
 			requestUpdate.onsuccess = function(event) {
 				closePopup();
